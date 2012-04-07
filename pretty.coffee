@@ -4,8 +4,9 @@ jQuery ->
     y = 0
     vy = 0
     t = 0
-    thrust = 1
+    thrust = 3
     vmax = 20
+    gravity = 2
 
     framerate = 60
     frametimes = [0,0,0,0,0,0,0,0,0,0]
@@ -22,7 +23,7 @@ jQuery ->
     #periods in milliseconds
     movePeriod = 5000
     oscillatePeriod = 2000
-    colorPeriod = 1000
+    colorPeriod = 10000
     
     canvas = jQuery("#canvas")[0]
     context = canvas.getContext("2d")
@@ -37,9 +38,19 @@ jQuery ->
 
     
     setPosition = ->
-        theta = 2 * Math.PI * Math.random()
-        vxp = vx + thrust * Math.cos(theta)
-        vyp = vy + thrust * Math.sin(theta)
+        
+        thetai = 2 * Math.PI * Math.random()
+        ax = thrust * Math.cos(thetai)
+        ay = thrust * Math.sin(thetai)
+        
+        dx = x - canvas.width / 2
+        dy = y - canvas.width / 2
+        dist =  Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2))
+        ax -= gravity * dx / dist
+        ay -= gravity * dy / dist
+        
+        vxp = vx + ax
+        vyp = vy + ay
         
         if Math.sqrt(Math.pow(vxp ,2) + Math.pow(vyp ,2)) <= vmax
             vx = vxp
