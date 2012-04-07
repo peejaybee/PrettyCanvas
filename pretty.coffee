@@ -27,8 +27,8 @@ jQuery ->
     
     canvas = jQuery("#canvas")[0]
     context = canvas.getContext("2d")
-#    context.strokeStyle = "#fff"
-#    context.fillStyle = "#fff"
+    x = canvas.width / 2
+    y = canvas.height / 2
 
     pickColor = ->
         hue = 180 + 180 * Math.sin((t % colorPeriod) / colorPeriod * 2 * Math.PI)
@@ -38,24 +38,26 @@ jQuery ->
 
     
     setPosition = ->
-        
+        #acceleration from random thrust
         thetai = 2 * Math.PI * Math.random()
         ax = thrust * Math.cos(thetai)
         ay = thrust * Math.sin(thetai)
         
+        #acceleration from "gravity"
         dx = x - canvas.width / 2
         dy = y - canvas.width / 2
         dist =  Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2))
         ax -= gravity * dx / dist
         ay -= gravity * dy / dist
         
+        #limit the maximum velocity by refusing to apply accelerations that will make it go faster
         vxp = vx + ax
         vyp = vy + ay
-        
         if Math.sqrt(Math.pow(vxp ,2) + Math.pow(vyp ,2)) <= vmax
             vx = vxp
             vy = vyp
        
+        #now move object according to the new velocity, wrapping around screen edges
         x += vx
         if x < 0
             x += canvas.width
@@ -67,6 +69,15 @@ jQuery ->
         if y > canvas.height
             y -= canvas.height
 
+    # probe wraps around actions to time them.
+    #use this way:
+    # probe ->
+    #   action1
+    #   action2
+    #   action3
+    # action4
+    #
+    # The total time for actions 1 through 3 will be measured and printed to the debug console
     probe = (x) ->
         probeStart  = new Date().getTime()
         x()
@@ -84,10 +95,9 @@ jQuery ->
         grad.addColorStop(1,"hsla(" + hue + sl + ",0.0)")
         context.fillStyle = grad
         context.fill()
- #       alert "I'm helping!"
-        
-    x = canvas.width / 2
-    y = canvas.height / 2
+    
+    
+    #Main method flow    
             
     setInterval =>
         now = new Date()
